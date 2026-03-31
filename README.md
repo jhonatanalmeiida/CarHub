@@ -128,7 +128,7 @@ O seed inicial cria:
 
 ## Documentacao adicional
 
-- [Guia de Uso](/Users/mclaren/Documents/New project/docs/getting-started.md)
-- [Arquitetura](/Users/mclaren/Documents/New project/docs/architecture.md)
-- [API](/Users/mclaren/Documents/New project/docs/api.md)
-- [Deploy AWS](/Users/mclaren/Documents/New project/docs/deployment.md)
+- [Guia de Uso](docs/getting-started.md)
+- [Arquitetura](docs/architecture.md)
+- [API](docs/api.md)
+- [Deploy AWS](docs/deployment.md)
