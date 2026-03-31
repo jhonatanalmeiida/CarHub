@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: 6 10 18;
+  --surface: 12 18 31;
+  --surface-elevated: 19 28 46;
+  --surface-soft: 26 36 55;
+  --surface-hover: 34 46 68;
+  --border: 102 120 152;
+  --text: 240 244 250;
+  --muted: 159 173 194;
+  --overlay: 3 8 20;
+  --shadow-rgb: 4 9 21;
+}
+
+.light {
+  color-scheme: light;
+  --bg: 244 247 251;
+  --surface: 255 255 255;
+  --surface-elevated: 237 242 248;
+  --surface-soft: 228 235 244;
+  --surface-hover: 217 227 239;
+  --border: 154 170 192;
+  --text: 15 23 42;
+  --muted: 81 95 118;
+  --overlay: 15 23 42;
+  --shadow-rgb: 148 163 184;
+}
+
+body {
+  @apply m-0 min-h-screen bg-[rgb(var(--bg))] font-body text-[rgb(var(--text))] antialiased;
+  background-image:
+    radial-gradient(circle at top left, rgba(31, 143, 255, 0.22), transparent 20%),
+    radial-gradient(circle at bottom right, rgba(24, 189, 160, 0.14), transparent 18%);
+}
+
+#root {
+  @apply min-h-screen;
+}
+
+.glass {
+  border: 1px solid rgb(var(--border) / 0.18);
+  background-color: rgb(var(--surface) / 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.bg-app {
+  background-color: rgb(var(--bg));
+}
+
+.text-muted {
+  color: rgb(var(--muted));
+}
+
+.surface {
+  background-color: rgb(var(--surface));
+}
+
+.surface-elevated {
+  background-color: rgb(var(--surface-elevated));
+}
+
+.surface-soft {
+  background-color: rgb(var(--surface-soft));
+}
+
+.border-app {
+  border-color: rgb(var(--border) / 0.22);
+}
+
+.soft-overlay {
+  background-color: rgb(var(--overlay) / 0.6);
+}
+
+.interactive-soft {
+  background-color: rgb(var(--surface-soft));
+}
+
+.interactive-soft:hover {
+  background-color: rgb(var(--surface-hover));
+}
+
+.theme-shadow {
+  box-shadow: 0 20px 60px rgb(var(--shadow-rgb) / 0.18);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 143, 255, 0.45) transparent;
+}

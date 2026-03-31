@@ -1,0 +1,108 @@
+variable "project_name" { type = string }
+variable "image_url" { type = string }
+variable "vpc_id" { type = string }
+variable "public_subnet_ids" { type = list(string) }
+variable "private_subnet_ids" { type = list(string) }
+variable "database_url" { type = string }
+variable "jwt_access_secret" { type = string }
+variable "jwt_refresh_secret" { type = string }
+variable "tags" { type = map(string) }
+
+resource "aws_ecs_cluster" "this" {
+  name = "${var.project_name}-cluster"
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/ecs/${var.project_name}"
+  retention_in_days = 14
+  tags              = var.tags
+}
+
+resource "aws_security_group" "service" {
+  name        = "${var.project_name}-service-sg"
+  description = "ECS service access"
+  vpc_id      = var.vpc_id
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = var.tags
+}
+
+resource "aws_iam_role" "task_execution" {
+  name = "${var.project_name}-task-execution-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action = "sts:AssumeRole"
+    }]
+  })
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "task_execution" {
+  role       = aws_iam_role.task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_ecs_task_definition" "this" {
+  family                   = "${var.project_name}-api"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.task_execution.arn
+  container_definitions = jsonencode([
+    {
+      name  = "api"
+      image = var.image_url
+      portMappings = [
+        {
+          containerPort = 3000
+          hostPort      = 3000
+        }
+      ]
+      environment = [
+        { name = "DATABASE_URL", value = var.database_url },
+        { name = "JWT_ACCESS_SECRET", value = var.jwt_access_secret },
+        { name = "JWT_REFRESH_SECRET", value = var.jwt_refresh_secret },
+        { name = "CORS_ORIGIN", value = "*" }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.this.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+  tags = var.tags
+}
+
+resource "aws_ecs_service" "this" {
+  name            = "${var.project_name}-service"
+  cluster         = aws_ecs_cluster.this.id
+  task_definition = aws_ecs_task_definition.this.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = var.public_subnet_ids
+    assign_public_ip = true
+    security_groups  = [aws_security_group.service.id]
+  }
+  tags = var.tags
+}
+
