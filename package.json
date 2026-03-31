@@ -1,0 +1,24 @@
+{
+  "name": "carhub-cloud",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CarHub Cloud monorepo",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "setup:env": "sh ./scripts/setup-env.sh",
+    "start": "npm run setup:env && sh ./scripts/start-docker.sh",
+    "start:local": "npm run setup:env && sh ./scripts/start-local.sh",
+    "db:start": "npm run setup:env && sh ./scripts/db-start.sh",
+    "db:stop": "sh ./scripts/db-stop.sh",
+    "db:prepare": "npm run setup:env && npm run prisma:push --workspace backend && npm run prisma:seed --workspace backend",
+    "dev": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build": "npm run build --workspace frontend && npm run build --workspace backend",
+    "test": "npm run test --workspace frontend && npm run test --workspace backend",
+    "lint": "npm run lint --workspace frontend && npm run lint --workspace backend"
+  }
+}
